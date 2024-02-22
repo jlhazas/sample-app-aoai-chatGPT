@@ -192,6 +192,13 @@ def should_use_data():
         logging.debug("Connecting to Azure Search endpoint...")
         search_client = SearchClient(AZURE_SEARCH_SERVICE, AZURE_SEARCH_INDEX, AzureKeyCredential(AZURE_SEARCH_KEY))
         logging.debug("Numero de documentos:" + str(search_client.get_document_count()))
+        try:
+                logging.debug("Ejecutando busqueda...")
+                results = search_client.search(search_text="Hola", select=["id", "text"])		
+                logging.debug("Numero de resultados: " + str(results.get_count()))
+        except Exception as e:
+                logging.debug("Error in search")
+                logging.debug(e)
         return True
     
     if AZURE_COSMOSDB_MONGO_VCORE_DATABASE and AZURE_COSMOSDB_MONGO_VCORE_CONTAINER and AZURE_COSMOSDB_MONGO_VCORE_INDEX and AZURE_COSMOSDB_MONGO_VCORE_CONNECTION_STRING:
