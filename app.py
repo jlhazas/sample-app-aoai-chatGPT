@@ -17,8 +17,10 @@ from quart import (
 
 from openai import AsyncAzureOpenAI
 from azure.identity.aio import DefaultAzureCredential, get_bearer_token_provider
+from azure.core.credentials import AzureKeyCredential
 from backend.auth.auth_utils import get_authenticated_user_details
 from backend.history.cosmosdbservice import CosmosConversationClient
+from azure.search.documents import SearchClient
 
 from backend.utils import format_as_ndjson, format_stream_response, generateFilterString, parse_multi_columns, format_non_streaming_response
 
@@ -187,6 +189,9 @@ def should_use_data():
     if AZURE_SEARCH_SERVICE and AZURE_SEARCH_INDEX:
         DATASOURCE_TYPE = "AzureCognitiveSearch"
         logging.debug("Using Azure Cognitive Search")
+        logging.debug("Connecting to Azure Search endpoint...")
+        search_client = SearchClient(AZURE_SEARCH_SERVICE, AZURE_SEARCH_INDEX, AzureKeyCredential(AZURE_SEARCH_KEY))
+        logging.debug("Numero de documentos:" + str(search_client.get_document_count()))
         return True
     
     if AZURE_COSMOSDB_MONGO_VCORE_DATABASE and AZURE_COSMOSDB_MONGO_VCORE_CONTAINER and AZURE_COSMOSDB_MONGO_VCORE_INDEX and AZURE_COSMOSDB_MONGO_VCORE_CONNECTION_STRING:
